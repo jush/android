@@ -59,10 +59,13 @@ class HomePresenterImpl @Inject constructor(
         mainScope.launch {
             val sessionValid = authenticationUseCase.getSessionState() == SessionState.CONNECTED
             if (sessionValid && integrationUseCase.isRegistered()) {
+                Log.i(TAG, "Session valid and is registered. Resync registration.")
                 resyncRegistration()
             } else if (sessionValid) {
+                Log.i(TAG, "Session valid but not registered. Display mobile app integration")
                 view.displayMobileAppIntegration()
             } else {
+                Log.i(TAG, "Session is not valid. Display onboarding")
                 view.displayOnBoarding()
             }
         }
@@ -77,14 +80,16 @@ class HomePresenterImpl @Inject constructor(
     }
 
     override suspend fun onEntityClicked(entityId: String, state: String) {
+        Log.d(TAG, "onEntityClicked() called with: entityId = $entityId, state = $state")
         val domain = entityId.split(".")[0]
         val serviceName = when (domain) {
             "lock" -> {
                 // Defaults to locking, to be save
-                if (state == "locked")
+                if (state == "locked") {
                     "unlock"
-                else
-                    "lock"
+                } else {
+                }
+                "lock"
             }
             in toggleDomains -> "toggle"
             else -> "turn_on"

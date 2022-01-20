@@ -70,7 +70,6 @@ fun LoadHomePage(
                             align = Alignment.Center
                         )
                     )
-/*
                     MainView(
                         mainViewModel,
                         mainViewModel.favoriteEntityIds,
@@ -88,10 +87,8 @@ fun LoadHomePage(
                         mainViewModel.isToastEnabled.value,
                         { id -> mainViewModel.removeFavorites(id) }
                     )
-*/
                 }
                 composable(SCREEN_ENTITY_LIST) {
-/*
                     EntityViewList(
                         entityLists = mainViewModel.entityLists,
                         entityListsOrder = mainViewModel.entityListsOrder,
@@ -103,7 +100,6 @@ fun LoadHomePage(
                         isHapticEnabled = mainViewModel.isHapticEnabled.value,
                         isToastEnabled = mainViewModel.isToastEnabled.value
                     )
-*/
                 }
                 composable(SCREEN_SETTINGS) {
 /*

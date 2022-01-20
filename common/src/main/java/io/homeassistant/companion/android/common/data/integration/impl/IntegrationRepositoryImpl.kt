@@ -227,6 +227,11 @@ class IntegrationRepositoryImpl @Inject constructor(
                             serviceCallRequest
                         )
                     ).isSuccessful
+                Log.d(
+                    TAG,
+                    "callService() called with: domain = $domain, service = $service, serviceData = $serviceData"
+                )
+                Log.d(TAG, "callService: wasSuccess = $wasSuccess")
             } catch (e: Exception) {
                 if (causeException == null) causeException = e
                 // Ignore failure until we are out of URLS to try, but use the first exception as cause exception
@@ -480,7 +485,7 @@ class IntegrationRepositoryImpl @Inject constructor(
                 it.lastChanged,
                 it.lastUpdated,
                 it.context
-            )
+            ).also { entity -> Log.d(TAG, "Found entity $entity") }
         }
             ?.sortedBy { it.entityId }
             ?.toList()

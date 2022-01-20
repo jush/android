@@ -92,6 +92,7 @@ dependencies {
     implementation("com.google.android.material:material:1.4.0")
 
     implementation("com.google.dagger:hilt-android:2.40.5")
+    implementation("androidx.wear.compose:compose-material:1.0.0-alpha14")
     kapt("com.google.dagger:hilt-android-compiler:2.40.5")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
