@@ -45,26 +45,6 @@ class HomeActivity : ComponentActivity(), HomeView {
         mainViewModel.init(presenter)
     }
 
-    override fun onResume() {
-        super.onResume()
-//        SensorWorker.start(this)
-
-//        initAllSensors()
-    }
-
-//    private fun initAllSensors() {
-//        for (manager in SensorReceiver.MANAGERS) {
-//            for (basicSensor in manager.getAvailableSensors(this)) {
-//                manager.isEnabled(this, basicSensor.id)
-//            }
-//        }
-//    }
-
-    override fun onPause() {
-        super.onPause()
-//        SensorWorker.start(this)
-    }
-
     override fun onDestroy() {
         presenter.onFinish()
         super.onDestroy()
