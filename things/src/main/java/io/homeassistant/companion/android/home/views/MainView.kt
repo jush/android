@@ -1,5 +1,6 @@
 package io.homeassistant.companion.android.home.views
 
+import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +26,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
@@ -40,6 +44,7 @@ import io.homeassistant.companion.android.util.getIcon
 import io.homeassistant.companion.android.util.onEntityClickedFeedback
 import io.homeassistant.companion.android.common.R as commonR
 
+private const val TAG = "MainView"
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi
 @Composable
@@ -63,6 +68,11 @@ fun MainView(
 
     WearAppTheme {
         Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(text = stringResource(id = io.homeassistant.companion.android.common.R.string.app_name))},
+                )
+            }
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -86,68 +96,20 @@ fun MainView(
                         )
                     }
                     if (expandedFavorites) {
-                        items(favoriteEntityIds.size) { index ->
-                            val favoriteEntityID = favoriteEntityIds[index].split(",")[0]
-                            if (mainViewModel.entities.isNullOrEmpty()) {
-                                // Use a normal chip when we don't have the state of the entity
-                                Chip(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    icon = {
-                                        Image(
-                                            asset = CommunityMaterial.Icon.cmd_cellphone,
-                                            colorFilter = ColorFilter.tint(wearColorPalette.onSurface)
-                                        )
-                                    },
-                                    label = {
-                                        Text(
-                                            text = favoriteEntityID,
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    },
-                                    onClick = {
-                                        onEntityClicked(favoriteEntityID, "unknown")
-                                        onEntityClickedFeedback(isToastEnabled, isHapticEnabled, context, favoriteEntityID, haptic)
-                                    },
-                                    colors = ChipDefaults.secondaryChipColors()
-                                )
-                            } else {
-                                var isValidEntity = false
-                                for (entity in mainViewModel.entities) {
-                                    if (entity.value.entityId == favoriteEntityID) {
-                                        isValidEntity = true
-                                        EntityUi(
-                                            mainViewModel.entities[favoriteEntityID]!!,
-                                            onEntityClicked,
-                                            isHapticEnabled,
-                                            isToastEnabled
-                                        )
-                                    }
-                                }
-                                if (!isValidEntity) {
-                                    deleteFavorite(favoriteEntityID)
-                                }
-                            }
-                        }
+                        favorites(
+                            favoriteEntityIds,
+                            mainViewModel,
+                            onEntityClicked,
+                            isToastEnabled,
+                            isHapticEnabled,
+                            context,
+                            haptic,
+                            deleteFavorite
+                        )
                     }
                 }
                 if (mainViewModel.entities.isNullOrEmpty()) {
-                    item {
-                        Column {
-                            ListHeader(id = commonR.string.loading)
-                            Chip(
-                                label = {
-                                    Text(
-                                        text = stringResource(commonR.string.loading_entities),
-                                        textAlign = TextAlign.Center
-                                    )
-                                },
-                                onClick = { /* No op */ },
-                                colors = ChipDefaults.primaryChipColors()
-                            )
-                        }
-                    }
+                    loadingEntities()
                 }
 
                 if (mainViewModel.entitiesByArea.values.any { it.isNotEmpty() }) {
@@ -258,6 +220,86 @@ fun MainView(
                         colors = ChipDefaults.secondaryChipColors()
                     )
                 }
+            }
+        }
+    }
+}
+
+private fun LazyListScope.loadingEntities() {
+    item {
+        Column {
+            ListHeader(id = commonR.string.loading)
+            Chip(
+                label = {
+                    Text(
+                        text = stringResource(commonR.string.loading_entities),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                onClick = {/* No op */ },
+                colors = ChipDefaults.primaryChipColors()
+            )
+        }
+    }
+}
+
+private fun LazyListScope.favorites(
+    favoriteEntityIds: List<String>,
+    mainViewModel: MainViewModel,
+    onEntityClicked: (String, String) -> Unit,
+    isToastEnabled: Boolean,
+    isHapticEnabled: Boolean,
+    context: Context,
+    haptic: HapticFeedback,
+    deleteFavorite: (String) -> Unit
+) {
+    items(favoriteEntityIds.size) { index ->
+        val favoriteEntityID = favoriteEntityIds[index].split(",")[0]
+        if (mainViewModel.entities.isNullOrEmpty()) {
+            // Use a normal chip when we don't have the state of the entity
+            Chip(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                icon = {
+                    Image(
+                        asset = CommunityMaterial.Icon.cmd_cellphone,
+                        colorFilter = ColorFilter.tint(wearColorPalette.onSurface)
+                    )
+                },
+                label = {
+                    Text(
+                        text = favoriteEntityID,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                onClick = {
+                    onEntityClicked(favoriteEntityID, "unknown")
+                    onEntityClickedFeedback(
+                        isToastEnabled,
+                        isHapticEnabled,
+                        context,
+                        favoriteEntityID,
+                        haptic
+                    )
+                },
+                colors = ChipDefaults.secondaryChipColors()
+            )
+        } else {
+            var isValidEntity = false
+            for (entity in mainViewModel.entities) {
+                if (entity.value.entityId == favoriteEntityID) {
+                    isValidEntity = true
+                    EntityUi(
+                        mainViewModel.entities[favoriteEntityID]!!,
+                        onEntityClicked,
+                        isHapticEnabled,
+                        isToastEnabled
+                    )
+                }
+            }
+            if (!isValidEntity) {
+                deleteFavorite(favoriteEntityID)
             }
         }
     }

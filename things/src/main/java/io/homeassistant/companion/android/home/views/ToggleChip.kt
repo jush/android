@@ -38,8 +38,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -564,6 +564,98 @@ public object ToggleChipDefaults {
      * Note that you can override it by applying Modifier.heightIn directly on [ToggleChip].
      */
     internal val Height = 52.dp
+
+    /**
+     * Creates switch style toggle [Icon]s for use in the toggleIcon slot of a [ToggleChip].
+     * Depending on [checked] will return either an 'on' (checked) or 'off' (unchecked) switch icon.
+     *
+     * @param checked whether the [ToggleChip] or [SplitToggleChip] is currently 'on' (checked/true)
+     * or 'off' (unchecked/false)
+     */
+    @Composable
+    public fun SwitchIcon(
+        checked: Boolean,
+    ) {
+        if (checked) {
+            Icon(
+                imageVector = SwitchOn,
+                contentDescription = "Switch selector",
+                modifier = Modifier.size(24.dp),
+            )
+        } else {
+            Icon(
+                imageVector = SwitchOff,
+                contentDescription = "Switch selector",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colors.onSurface.copy(0.6f)
+            )
+        }
+    }
+
+
+    private val SwitchOn: ImageVector
+        get() {
+            if (_switchOn != null) {
+                return _switchOn!!
+            }
+            _switchOn = materialIcon(name = "SwitchOn") {
+                materialPath(fillAlpha = 0.38f, strokeAlpha = 0.38f) {
+                    moveTo(5.0f, 7.0f)
+                    lineTo(19.0f, 7.0f)
+                    arcTo(5.0f, 5.0f, 0.0f, false, true, 24.0f, 12.0f)
+                    lineTo(24.0f, 12.0f)
+                    arcTo(5.0f, 5.0f, 0.0f, false, true, 19.0f, 17.0f)
+                    lineTo(5.0f, 17.0f)
+                    arcTo(5.0f, 5.0f, 0.0f, false, true, 0.0f, 12.0f)
+                    lineTo(0.0f, 12.0f)
+                    arcTo(5.0f, 5.0f, 0.0f, false, true, 5.0f, 7.0f)
+                    close()
+                }
+                materialPath(pathFillType = PathFillType.EvenOdd) {
+                    moveTo(17.0f, 19.0f)
+                    curveTo(20.866f, 19.0f, 24.0f, 15.866f, 24.0f, 12.0f)
+                    curveTo(24.0f, 8.134f, 20.866f, 5.0f, 17.0f, 5.0f)
+                    curveTo(13.134f, 5.0f, 10.0f, 8.134f, 10.0f, 12.0f)
+                    curveTo(10.0f, 15.866f, 13.134f, 19.0f, 17.0f, 19.0f)
+                    close()
+                }
+            }
+            return _switchOn!!
+        }
+
+    private var _switchOn: ImageVector? = null
+
+    private val SwitchOff: ImageVector
+        get() {
+            if (_switchOff != null) {
+                return _switchOff!!
+            }
+            _switchOff = materialIcon(name = "SwitchOff") {
+                materialPath(fillAlpha = 0.38f, strokeAlpha = 0.38f) {
+                    moveTo(5.0f, 7.0f)
+                    lineTo(19.0f, 7.0f)
+                    arcTo(5.0f, 5.0f, 0.0f, false, true, 24.0f, 12.0f)
+                    lineTo(24.0f, 12.0f)
+                    arcTo(5.0f, 5.0f, 0.0f, false, true, 19.0f, 17.0f)
+                    lineTo(5.0f, 17.0f)
+                    arcTo(5.0f, 5.0f, 0.0f, false, true, 0.0f, 12.0f)
+                    lineTo(0.0f, 12.0f)
+                    arcTo(5.0f, 5.0f, 0.0f, false, true, 5.0f, 7.0f)
+                    close()
+                }
+                materialPath(pathFillType = PathFillType.EvenOdd) {
+                    moveTo(7.0f, 19.0f)
+                    curveTo(10.866f, 19.0f, 14.0f, 15.866f, 14.0f, 12.0f)
+                    curveTo(14.0f, 8.134f, 10.866f, 5.0f, 7.0f, 5.0f)
+                    curveTo(3.134f, 5.0f, 0.0f, 8.134f, 0.0f, 12.0f)
+                    curveTo(0.0f, 15.866f, 3.134f, 19.0f, 7.0f, 19.0f)
+                    close()
+                }
+            }
+            return _switchOff!!
+        }
+
+    private var _switchOff: ImageVector? = null
 }
 
 /**
